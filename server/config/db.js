@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
+const keys = require('./keys');
 
-// Note: login to mongodb.com and view all collections under cluster name ClusterTestMongoDB. 
-// The db name is "test"
-// change below to MONGO_URI_LIVE when going live
 const connectDB = async () => {
-  const conn = await mongoose.connect(process.env.MONGO_URI);
+  if (process.env.NODE_ENV === 'production') {  
+    const conn = await mongoose.connect( keys.mongoDB );
+  }
+
+  const conn = await mongoose.connect( keys.mongoDBLocal );
 
   console.log(`MongoDB Connected: ${conn.connection.host}`.cyan.underline.bold);
 };

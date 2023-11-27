@@ -1,22 +1,25 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const colors = require('colors');
 const cors = require('cors');
 const multer = require('multer');
 const { graphqlHTTP } = require('express-graphql');
 
-require('dotenv').config();
-
 const schema = require('./schema/schema');
+
 const connectDB = require('./config/db');
+
+require('dotenv').config();
 
 const port = process.env.PORT || 5000;
 
 const app = express();
 
-// Connect to database
+// Connect to mongoDB database
 connectDB();
 
 app.use(cors());
+
 app.use(express.json());
 
 const storage = multer.diskStorage({
@@ -37,8 +40,6 @@ app.post('/uploadFile', upload.single('attachment'), (req, res) => {
   res.send(file);
 })
 
-// console.log('ENV', process.env.MONGO_URI);
-
 app.use(
   '/graphql',
   graphqlHTTP({
@@ -48,3 +49,5 @@ app.use(
 );
 
 app.listen(port, console.log(`Server running on port ${port}`));
+
+process.setMaxListeners(0);

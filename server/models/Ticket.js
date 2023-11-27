@@ -32,9 +32,10 @@ const TicketSchema = new mongoose.Schema({
     }
   ],
   submitter: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   },
-  projectID: {
+  project: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
   }

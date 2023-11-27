@@ -1,7 +1,7 @@
-const User = require('../models/User');
-const Project = require('../models/Project');
-const Ticket = require('../models/Ticket');
-const Comment = require('../models/Comment');
+const User       = require('../models/User');
+const Project    = require('../models/Project');
+const Ticket     = require('../models/Ticket');
+const Comment    = require('../models/Comment');
 const Attachment = require('../models/Attachment');
 
 const {
@@ -96,7 +96,13 @@ const TicketType = new GraphQLObjectType({
         return Attachment.find({ ticketID: parent.id });
       } 
     },
-    submitter: { type: GraphQLString },
+    submitter: { 
+      type: UserType,
+      resolve(parent, args) {
+        console.log(parent, args);
+        return User.find({ _id: parent.submitter });
+      } 
+    },
     project: { 
       type: ProjectType,
       resolve(parent, args) { 
@@ -404,7 +410,7 @@ const mutation = new GraphQLObjectType({
         priority: { type: GraphQLNonNull(GraphQLString) },  
         assignee: { type: new GraphQLList(new GraphQLNonNull(GraphQLID)) },   
         submitter: { type: GraphQLNonNull(GraphQLID) },
-        projectID: { type: GraphQLNonNull(GraphQLID) },
+        project: { type: GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
         const ticket = new Ticket({
