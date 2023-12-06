@@ -383,9 +383,10 @@ const mutation = new GraphQLObjectType({
         image: { type: GraphQLString }, 
         attachment: { type: GraphQLString }, 
         clientID: { type: GraphQLID }, 
-        assignee: { type: new GraphQLList(GraphQLID) },
-        tickets: { type: new GraphQLList(GraphQLString) },
+        assignee: { type: new GraphQLList(new GraphQLNonNull(GraphQLString)) },   
+        tickets: { type: new GraphQLList(new GraphQLNonNull(GraphQLString)) },   
         status: { type: GraphQLString },
+        createdBy: { type: GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
               
@@ -395,6 +396,7 @@ const mutation = new GraphQLObjectType({
           args.id,
           {
             $set: {
+              id: args.id,
               title: args.title,
               description: args.description,
               image: args.image,

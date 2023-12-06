@@ -8,49 +8,38 @@ import { GET_PROJECT, GET_CLIENTS, GET_USERS } from '../queries/projectQueries';
 
 export default function UpdateProjectModal({ project }) {
 
-  const testID = '656e877869a5d4e6ae02add9';
-
-  //const getProject = useQuery(GET_PROJECT, { variables: { id: testID } });
-
-  const { loading, error, data } = useQuery(GET_PROJECT, {
-   variables: { id: testID },
-  });
-
   const adminID = '655876c0d467b3b136a481c4'; // TODO: make this dynamic
 
+  const [projectID, setProjectID] = useState(project.id);
   const [title, setTitle] = useState(project.title);
   const [description, setDescription] = useState(project.description);
   const [image, setImage] = useState(project.image);
   const [attachment, setAttachment] = useState(project.attachment);
   const [clientID, setClientID] = useState(project.clientID.id);
-  const [ticket, setTicket] = useState(project.tickets);
+  const [tickets, setTickets] = useState(project.tickets.map(item => item.id));
   const [assignees, setAssignees] = useState(project.assignee);  
   const [status, setStatus] = useState(project.status);
+
   const [createdBy, setCreatedBy] = useState(adminID);
 
   // State once auth method is built...
   const [loggedIn, setLoggedIn] = useState(true);
 
   const [updateProject] = useMutation(UPDATE_PROJECT, {
-    variables: { title, description, image, attachment, clientID, ticket, assignees, status, createdBy },
-    update(cache, { data: { updateProject } }) {
-      
-      // get all data from the database
-      const { projects } = cache.readQuery({ query: GET_PROJECTS });
+    variables: { id: projectID, title, description, image, attachment, clientID, tickets, assignees, status, createdBy },
+    refetchQueries: [{ query: GET_PROJECT, variables: { id: projectID } }],
+  });
 
-      // And then append the new data and update the UI
-      // cache.writeQuery({
-      //   query: GET_PROJECTS,
-      //   data: { projects: [...projects, addProject] },
-      // });
-    },
+  const { loading, error, data } = useQuery(GET_PROJECT, {
+   variables: { id: projectID },
   });
 
   //console.log('From project data', data);
 
   const getClients = useQuery(GET_USERS);
 
-  //console.log('getClients', getClients);
+  console.log('project', project);
+  console.log('tickets state', tickets);
 
   const getUsers = useQuery(GET_USERS);
 
@@ -144,29 +133,29 @@ export default function UpdateProjectModal({ project }) {
       //return alert('Please fill in all fields');
     }
 
-    console.log({ title, description, image, attachment, clientID, ticket, assignees, status, createdBy });
+    console.log({ projectID, title, description, image, attachment, clientID, tickets, assignees, status, createdBy });
     
-    if (title !== '' && 
-        description !== '' && 
-        image !== '' && 
-        attachment !== '' && 
-        clientID !== '' && 
-        ticket.length > 0 && 
-        assignees.length > 0 && 
-        status !== '' && 
-        createdBy !== '') {
+    // if (title !== '' && 
+    //     description !== '' && 
+    //     image !== '' && 
+    //     attachment !== '' && 
+    //     clientID !== '' && 
+    //     tickets.length > 0 && 
+    //     assignees.length > 0 && 
+    //     status !== '' && 
+    //     createdBy !== '') {
 
         // Mutation
-        //addProject(title, description, image, attachment, clientID, ticket, assignee, status, createdBy);
-    }
+        updateProject(projectID, title, description, image, attachment, clientID, tickets, assignees, status, createdBy);
+    //}
     
     setTitle('');
     setDescription('');
-    setImage('');
-    setAttachment('');
-    setClientID('');
-    setTicket([]);
-    setAssignees([]);
+    //setImage('');
+    //setAttachment('');
+    //setClientID('');
+    //setTickets([]);
+    //setAssignees([]);
     setStatus('');
     setCreatedBy('');
   };
@@ -186,7 +175,7 @@ export default function UpdateProjectModal({ project }) {
         type='text'
         className='form-control'
         id='id'
-        value={testID}
+        value={project.id}
         readOnly
         />
         <div className='mb-3'>
