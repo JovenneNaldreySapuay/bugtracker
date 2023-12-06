@@ -1,8 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-//import Header from './components/Header';
+import Tickets from './components/Tickets';
 import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client';
 import Home from './pages/Home';
+import Ticket from './pages/Ticket';
 import Project from './pages/Project';
 
 // see this to fix error when caching...
@@ -16,11 +17,11 @@ const cache = new InMemoryCache({
             return incoming;
           },
         },
-        //tickets: {
-          //merge(existing, incoming) {
-            //return incoming;
-          //},
-        //},
+        tickets: {
+          merge(existing, incoming) {
+            return incoming;
+          },
+        },
       },
     },
   },
@@ -36,11 +37,12 @@ function App() {
     <>
       <ApolloProvider client={client}>
         <Router>
-          
           <div className='container'>
             <Routes>
               <Route path='/' element={<Home />} />
               <Route path='/projects/:id' element={<Project />} />
+              <Route path='/tickets' element={<Tickets />} />
+              <Route path='/tickets/:id' element={<Ticket />} />
             </Routes>
           </div>
         </Router>

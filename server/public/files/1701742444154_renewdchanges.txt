@@ -1,0 +1,60 @@
+functions.php 
+
+// Renewd PMPro  
+require_once( RENEWED_THEME_DIR . '/includes/renewd-pmpro.php' );
+
+
+##
+
+<?php 
+if invoice only make another email template and replace line 909-910 on checkout.php file
+
+jQuery("#bfirstname").val("Jake");
+jQuery("#blastname").val("Tran");
+jQuery("#bemail").val("jake@tran.io");
+jQuery("#bconfirmemail").val("jake@tran.io");
+jQuery("#baddress1").val("Blk 1");
+jQuery("#baddress2").val("Corner St");
+jQuery("#bcity").val("Atlanta");
+jQuery("#bstate").val("Georgia");
+jQuery("#bzipcode").val("30003");
+jQuery("#bcountry").prop('selectedIndex', 234);
+jQuery("#bphone").val("123-456-432");
+
+pmp pro working plugin version = Version 2.7.3
+
+
+go-child > paid membership > pages > checkout.php 
+1. put required on input tags 
+2. 338 - 348
+
+plugins > paid membership > preheaders > checkout.php - lines 919-988
+
+js > custom.js line 590-644 ajax call as well as 477-587
+
+go-child > includes > renewd-hooks.php lines 257-333
+
+=========
+
+File changes:
+plugins > pmpro > classes > gateways > class.pmprogateway_stripe.php 955, 957
+plugins > pmpro > preheaders > checkout.php lines 67, 70, 72, 77, 326, 336, 481, 482, 659
+
+go-child > pages > checkout.php line 133, 351
+
+from this:
+
+<h2>
+<span class="<?php echo esc_attr( pmpro_get_element_class( 'pmpro_checkout-h2-name' ) ); ?>"><?php esc_html_e( 'Payment Information', 'paid-memberships-pro' ); ?></span>
+<span class="<?php echo esc_attr( pmpro_get_element_class( 'pmpro_checkout-h2-msg' ) ); ?>"><?php esc_html_e( 'We accept all major credit cards', 'paid-memberships-pro' ); ?></span>
+</h2>
+
+
+to this:
+
+<?php do_action( 'pmpro_or_text_separator' ); ?>
+
+<h2 style="margin: 0;">
+<span class="<?php echo esc_attr( pmpro_get_element_class( 'pmpro_checkout-h2-name' ) ); ?>"><?php echo apply_filters( "pmpro_payment_text", "Payment Information" ); ?></span>
+<span class="<?php echo esc_attr( pmpro_get_element_class( 'pmpro_checkout-h2-msg' ) ); ?>"><?php esc_html_e( 'We accept all major credit cards', 'paid-memberships-pro' ); ?></span>
+</h2>

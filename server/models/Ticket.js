@@ -16,7 +16,7 @@ const TicketSchema = new mongoose.Schema({
   priority: {
     type: String,
   },
-  assignee: [
+  assignees: [
     {
       type: String,
     }
@@ -24,11 +24,13 @@ const TicketSchema = new mongoose.Schema({
   comments: [
     {
       type: String,
+      default: undefined
     }
   ],
   attachments: [
     {
       type: String,
+      default: undefined
     }
   ],
   submitter: {

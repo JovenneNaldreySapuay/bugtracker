@@ -4,7 +4,7 @@
   "description": "A full-stack bugtracker app build using GraphQL, Node, React, MongoDB",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server/index.js",
+    "start": "node server/index.js",
     "dev": "nodemon server/index.js"
   },
   "keywords": [],

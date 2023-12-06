@@ -63,7 +63,9 @@ const GET_PROJECT = gql`
       tickets {
         id
         title
+        description
         comments {
+          id
           message
         }
       }

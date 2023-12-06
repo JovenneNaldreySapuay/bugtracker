@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const User       = require('../models/User');
 const Project    = require('../models/Project');
 const Ticket     = require('../models/Ticket');
@@ -48,7 +50,8 @@ const ProjectType = new GraphQLObjectType({
     tickets: {
       type: new GraphQLList(TicketType),
       resolve(parent, args) {
-        return Ticket.find({ projectID: parent.id });
+        //console.log(parent, args);
+        return Ticket.find({ _id: parent.tickets });
       } 
     },
     assignee: { 
@@ -77,16 +80,16 @@ const TicketType = new GraphQLObjectType({
     ticketType: { type: GraphQLString },
     status: { type: GraphQLString },
     priority: { type: GraphQLString },
-    assignee: { 
+    assignees: { 
       type: new GraphQLList(UserType), 
       resolve(parent, args) {
-        return User.find({ _id: parent.assignee });
+        //console.log(parent, args);
+        return User.find({ _id: parent.assignees });
       } 
     },
     comments: {
       type: new GraphQLList(CommentType), 
       resolve(parent, args) {
-        // parent.id is the Comment table _id: new ObjectId('655c1335e769491f99c3e129')
         return Comment.find({ ticketID: parent.id });
       } 
     },
@@ -99,14 +102,13 @@ const TicketType = new GraphQLObjectType({
     submitter: { 
       type: UserType,
       resolve(parent, args) {
-        console.log(parent, args);
-        return User.find({ _id: parent.submitter });
+        return User.findById(parent.submitter);
       } 
     },
     project: { 
       type: ProjectType,
       resolve(parent, args) { 
-        return Project.findById(parent.projectID);
+        return Project.findById(parent.project);
       }
     },
   }),
@@ -210,7 +212,7 @@ const RootQuery = new GraphQLObjectType({
       resolve(parent, args) {   
         // info: https://stackoverflow.com/questions/14940660/whats-mongoose-error-cast-to-objectid-failed-for-value-xxx-at-path-id
         if (args.project_id.match(/^[0-9a-fA-F]{24}$/)) { 
-          return Ticket.find({ projectID: args.project_id });
+          return Ticket.find({ project: args.project_id });
         }
       }
     },
@@ -358,6 +360,7 @@ const mutation = new GraphQLObjectType({
         });
 
         return project.save();
+
       },
     },
     // Delete project
@@ -375,14 +378,19 @@ const mutation = new GraphQLObjectType({
       type: ProjectType,
       args: {
         id: { type: GraphQLNonNull(GraphQLID) },
-        title: { type: GraphQLNonNull(GraphQLString) },
-        description: { type: GraphQLNonNull(GraphQLString) },
-        image: { type: GraphQLNonNull(GraphQLString) }, 
-        attachment: { type: GraphQLNonNull(GraphQLString) }, 
-        assignee: { type: new GraphQLList(new GraphQLNonNull(GraphQLID)) },
-        status: { type: GraphQLNonNull(GraphQLString) },
+        title: { type: GraphQLString },
+        description: { type: GraphQLString },
+        image: { type: GraphQLString }, 
+        attachment: { type: GraphQLString }, 
+        clientID: { type: GraphQLID }, 
+        assignee: { type: new GraphQLList(GraphQLID) },
+        tickets: { type: new GraphQLList(GraphQLString) },
+        status: { type: GraphQLString },
       },
       resolve(parent, args) {
+              
+        console.log('UPDATE PROJECT:', args);
+
         return Project.findByIdAndUpdate(
           args.id,
           {
@@ -391,7 +399,9 @@ const mutation = new GraphQLObjectType({
               description: args.description,
               image: args.image,
               attachment: args.attachment,
+              clientID: args.clientID,
               assignee: args.assignee, 
+              tickets: args.tickets,
               status: args.status,
             },
           },
@@ -408,23 +418,35 @@ const mutation = new GraphQLObjectType({
         ticketType: { type: GraphQLString },
         status: { type: GraphQLNonNull(GraphQLString) },  
         priority: { type: GraphQLNonNull(GraphQLString) },  
-        assignee: { type: new GraphQLList(new GraphQLNonNull(GraphQLID)) },   
+        assignees: { type: new GraphQLList(new GraphQLNonNull(GraphQLString)) }, 
+        comments: { type: new GraphQLList(GraphQLString) },   
+        attachments: { type: new GraphQLList(GraphQLString) },   
         submitter: { type: GraphQLNonNull(GraphQLID) },
         project: { type: GraphQLNonNull(GraphQLID) },
       },
-      resolve(parent, args) {
+      async resolve(parent, args) {
         const ticket = new Ticket({
           title: args.title,
           description: args.description,
           ticketType: args.ticketType,
           status: args.status,
           priority: args.priority,
-          assignee: args.assignee,
+          assignees: args.assignees,
+          comments: args.comments,
+          attachments: args.attachments,
           submitter: args.submitter,
-          projectID: args.projectID
+          project: args.project
         });
 
-        return ticket.save();
+        ticket.save().then(async function(tick) {
+          //console.log('ticktick', tick._id, tick._id.toString());
+          
+          const projectF = await Project.findById({ _id: new mongoose.Types.ObjectId(args.project)});
+
+          await projectF.tickets?.push(tick._id.toString());
+
+          projectF.save();
+        });    
       },
     },
     // Delete ticket 

@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const keys = require('./keys');
 
 const connectDB = async () => {
-  if (process.env.NODE_ENV === 'production') {  
-    const conn = await mongoose.connect( keys.mongoDB );
-  }
+  //if (process.env.NODE_ENV === 'production') {  
+    //const conn = await mongoose.connect( keys.mongoDB );
+  //}
 
   const conn = await mongoose.connect( keys.mongoDBLocal );
 
@@ -12,3 +12,5 @@ const connectDB = async () => {
 };
 
 module.exports = connectDB;
+
+// render pass: $2aL1x5@!gD

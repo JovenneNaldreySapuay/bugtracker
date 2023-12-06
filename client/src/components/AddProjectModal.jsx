@@ -23,13 +23,22 @@ export default function AddProjectModal() {
   const [addProject] = useMutation(ADD_PROJECT, {
     variables: { title, description, image, attachment, clientID, ticket, assignee, status, createdBy },
     update(cache, { data: { addProject } }) {
+      
+      // get all data from the database
       const { projects } = cache.readQuery({ query: GET_PROJECTS });
+      
+      console.log('ALL PROJECTS:', projects);
+      console.log('cache:', cache);
+
+      // And then append the new data and update the UI
       cache.writeQuery({
         query: GET_PROJECTS,
         data: { projects: [...projects, addProject] },
       });
     },
   });
+
+  // console.log('From cache projects', projects);
 
   const getUsers = useQuery(GET_USERS);
 

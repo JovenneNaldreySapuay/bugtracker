@@ -1,6 +1,9 @@
+// adding schema - https://stackoverflow.com/a/52641897
+
 const mongoose = require('mongoose');
 
 const ProjectSchema = new mongoose.Schema({
+  //_id: mongoose.Schema.ObjectId,
   title: {
     type: String,
   },
@@ -13,13 +16,14 @@ const ProjectSchema = new mongoose.Schema({
   attachment: {
     type: String,
   },
-  clientID: {
+  clientID: { 
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
   tickets: [
     {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Ticket'
     }   
   ],
   assignee: [

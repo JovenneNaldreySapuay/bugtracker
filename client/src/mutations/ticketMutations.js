@@ -23,7 +23,7 @@ const ADD_TICKET = gql`
       comments: $comments
       attachments: $attachments
       submitter: $submitter
-	    project: $projectID
+	    project: $project
     ) {
       id
       title

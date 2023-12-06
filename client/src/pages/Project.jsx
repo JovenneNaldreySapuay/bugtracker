@@ -1,15 +1,25 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { FaSyncAlt } from 'react-icons/fa';
 import Spinner from '../components/Spinner';
 import AddTicketModal from '../components/AddTicketModal';
+import TicketCard from '../components/TicketCard';
+
 //import DeleteProjectButton from '../components/DeleteProjectButton';
 //import EditProjectForm from '../components/EditProjectForm';
+import UpdateProjectModal from '../components/UpdateProjectModal';
 import { useQuery } from '@apollo/client';
 import { GET_PROJECT } from '../queries/projectQueries';
 
 export default function Project() {
   const { id } = useParams();
-  const { loading, error, data } = useQuery(GET_PROJECT, { variables: { id } });
+  //console.log('ID Belongs to:', id);
+  const { loading, error, data, refetch } = useQuery(GET_PROJECT, {
+   variables: { id },
+   // pollInterval: 500, 
+  });
+
+  //console.log('Get single project:', data);
 
   if (loading) return <Spinner />;
   if (error) return <p>Something Went Wrong</p>;
@@ -53,6 +63,41 @@ export default function Project() {
           <h5 className='mt-3'>Client Info</h5>
           <p className='lead'>{data.project.clientID.name} - {data.project.clientID.website}</p>
 
+          <h5 className='mt-3'>Tickets <span style={{color: 'blue', fontSize: '14px', cursor: 'pointer'}} onClick={() => refetch()}><FaSyncAlt className='icon' />Reload</span></h5>
+          {
+            data.project.tickets.length > 0 ? (
+              <ol>
+              {
+                data.project.tickets.map((ticket, idx) => (
+                  <li key={ticket.id}>
+                    {ticket.title}
+                    {
+                      data.project.tickets[idx].comments.length > 0 ? (
+                        <ul>
+                           {
+                            data.project.tickets[idx].comments.map((comment) => (
+                               <li key={comment.id}><strong><em>{`${comment.user.name} commented: `}</em></strong>{comment.message}</li> 
+                            ))
+                           } 
+                        </ul>
+                      ) : (
+                      <p>No message for this ticket.</p>
+                      )
+                    }
+                  </li>
+                ))
+              }
+              </ol>
+            ) : 
+            (
+              <p>No tickets for this project</p>
+            )
+          }
+          
+          {data.project.tickets?.map((ticket, id) => (
+            <TicketCard key={ticket.id} ticket={ticket} />
+          ))}
+
           {/*<ClientInfo client={data.project.clientId.name} />*/}
 
           {/*<EditProjectForm project={data.project} />*/}
@@ -60,6 +105,9 @@ export default function Project() {
           {/*<DeleteProjectButton projectId={data.project.id} />*/}
 
           <AddTicketModal />
+
+          <UpdateProjectModal project={data.project} />
+
         </div>
       )}
     </>

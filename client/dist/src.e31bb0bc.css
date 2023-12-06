@@ -49,13 +49,17 @@ code {
   margin-right: 5px;
 }
 
-.project-table {
+.project-table,
+.ticket-table {
   width: 100%;
 }
 
 .project-table,
 .project-table th, 
-.project-table td {
+.project-table td,
+.ticket-table,
+.ticket-table th, 
+.ticket-table td {
   border: 1px solid #444;
 }
 

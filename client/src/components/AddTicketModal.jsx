@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
+import { useHistory, useParams } from 'react-router-dom';
 import { FaList } from 'react-icons/fa';
 import { useMutation, useQuery } from '@apollo/client';
-import { ADD_PROJECT } from '../mutations/projectMutations';
-import { GET_PROJECTS, GET_USERS } from '../queries/projectQueries';
+import { ADD_TICKET } from '../mutations/ticketMutations';
+import { GET_USERS, GET_PROJECT } from '../queries/projectQueries';
+import { GET_TICKETS } from '../queries/ticketQueries';
 
 export default function AddTicketModal() {
 
@@ -15,24 +17,60 @@ export default function AddTicketModal() {
   const [ticketType, setTicketType] = useState('');
   const [status, setStatus] = useState('');
   const [priority, setPriority] = useState('');
-  const [assignees, setAssignees] = useState([]);  
-  const [submitterID, setSubmitterID] = useState('');
-  const [projectID, setProjectID] = useState('');
+  const [assignees, setAssignees] = useState([]);
+  const [comments, setComments] = useState([]);  
+  const [attachments, setAttachments] = useState([]);  
+  const [submitter, setSubmitter] = useState(adminID);
+  const [project, setProject] = useState(window.location.pathname.split("/")[2]);
+  const [redirectTo, setRedirectTo] = useState(false);
+
+
+  const [addTicket] = useMutation(ADD_TICKET, {
+    variables: {
+       title, 
+       description, 
+       ticketType, 
+       status, 
+       priority, 
+       assignees, 
+       comments, 
+       attachments, 
+       submitter, 
+       project 
+    },
+    //refetchQueries: [
+       //GET_PROJECT,
+       //'getProject' 
+    //]
+  });
 
   /*
   const [addTicket] = useMutation(ADD_TICKET, {
-    variables: { title, description, ticketType, status, priority, assignees, submitterID, projectID },
+    variables: { title, description, ticketType, status, priority, assignees, comments, attachments, submitter, project },
     update(cache, { data: { addTicket } }) {
+      console.log('cache', cache.readQuery({ query: GET_PROJECTS }));
+
       const { tickets } = cache.readQuery({ query: GET_TICKETS });
+      
+      console.log('TICKETS', tickets);
+
       cache.writeQuery({
         query: GET_PROJECTS,
-        data: { tickets: [...tickets, addTicket] },
+        data: { 
+          tickets: [...tickets, addTicket] 
+        },
       });
     },
   });
   */
-
+ 
   const getUsers = useQuery(GET_USERS);
+
+  const { id } = useParams();
+
+  //const getProject = useQuery(GET_PROJECT, { variables: { id } });
+
+  //console.log('getProject query', getProject, id);
 
   const userLists = getUsers.data?.users; 
 
@@ -43,7 +81,6 @@ export default function AddTicketModal() {
   }) => ({
   value,
   label,
-  ...rest
   }));
 
   const handleAssignees = (e) => {
@@ -54,8 +91,8 @@ export default function AddTicketModal() {
     <Select 
       className="dropdown"
       placeholder="Select Assignees"
-      options={{}} 
-      value={{}}
+      options={assignedUsers} 
+      value={assignedUsers?.filter(obj => assignees.includes(obj.value))}
       onChange={handleAssignees}
       isMulti 
       isClearable 
@@ -67,27 +104,23 @@ export default function AddTicketModal() {
 
   const onSubmit = (e) => {
     e.preventDefault();
-
+    
     if (title === '' || description === '' || status === '') {
       console.log('Please fill in all fields');
 
       //return alert('Please fill in all fields');
     }
 
-    console.log({ title, description, image, attachment, clientID, ticket, assignee, status, createdBy });
+    console.log({ title, description, ticketType, status, priority, assignees, comments, attachments, submitter, project });
     
     if (title !== '' && 
         description !== '' && 
-        image !== '' && 
-        attachment !== '' && 
-        clientID !== '' && 
-        ticket.length > 0 && 
-        assignee.length > 0 && 
+        ticketType !== '' && 
         status !== '' && 
-        createdBy !== '') {
+        priority !== '') {
 
         // Mutation
-        //addTicket(title, description, image, attachment, clientID, ticket, assignee, status, createdBy);
+        addTicket(title, description, ticketType, status, priority, assignees, comments, attachments, submitter, project);       
     }
     
     setTitle('');
@@ -96,9 +129,10 @@ export default function AddTicketModal() {
     setStatus('');
     setPriority('');
     setAssignees([]);
-    setSubmitterID('');
-    setProjectID('');
-
+    setComments([]);
+    setAttachments([]);
+    setSubmitter('');
+    setProject('');
   };
 
   //if (loading) return null;
@@ -113,6 +147,7 @@ export default function AddTicketModal() {
             className='btn btn-primary'
             data-bs-toggle='modal'
             data-bs-target='#addTicketModal'
+            style={{width: '150px'}}
           >
             <div className='d-flex align-items-center'>
               <FaList className='icon' />
@@ -141,6 +176,7 @@ export default function AddTicketModal() {
                 </div>
                 <div className='modal-body'>
                   <form onSubmit={onSubmit}>
+
                     <div className='mb-3'>
                       <label className='form-label'>Title</label>
                       <input
@@ -213,7 +249,7 @@ export default function AddTicketModal() {
                     </div>
 
                     <div className='mb-3'>
-                      <label className='form-label'>Project Assignees</label>
+                      <label className='form-label'>Ticket Assignees</label>
                       <div>
                         <ProjectAssignees />
                       </div>
@@ -226,7 +262,7 @@ export default function AddTicketModal() {
                     >
                       Save
                     </button>
-                  </form>
+                  </form>                  
                 </div>
               </div>
             </div>

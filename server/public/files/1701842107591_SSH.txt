@@ -1,0 +1,10 @@
+ssh root@202.182.125.49 
+pass: +1eF99AQvrow%rxD
+
+http://www.jnsdevsandbox.xyz/admin 
+user: admin 
+pass: Ju$tdo!t@2022
+
+Wordpress: http://www.jnsdevsandbox.xyz/wp-admin
+user: admin
+login pw: Q7tmwiEV*Z&QLPczZw
