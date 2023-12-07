@@ -2,6 +2,11 @@ import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import AddTicketModal from '../components/AddTicketModal';
+
+import AddComment from '../components/AddComment';
+import Comment from './Comment';
+import AddCommentFile from '../components/AddCommentFile';
+
 //import DeleteProjectButton from '../components/DeleteProjectButton';
 //import EditProjectForm from '../components/EditProjectForm';
 import { useQuery } from '@apollo/client';
@@ -43,6 +48,12 @@ export default function Project() {
           <h5 className='mt-3'>Submitted By</h5>
           <p className='lead'>{data.ticket.submitter.name}</p> 
           
+          <hr />
+
+          <Comment />
+          <AddComment ticket={data.ticket} />
+
+          <AddCommentFile />
         </div>
       )}
     </>

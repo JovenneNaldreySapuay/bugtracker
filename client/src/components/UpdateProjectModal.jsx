@@ -149,15 +149,15 @@ export default function UpdateProjectModal({ project }) {
         updateProject(projectID, title, description, image, attachment, clientID, tickets, assignees, status, createdBy);
     //}
     
-    setTitle('');
-    setDescription('');
+    //setTitle('');
+    //setDescription('');
     //setImage('');
     //setAttachment('');
     //setClientID('');
     //setTickets([]);
     //setAssignees([]);
-    setStatus('');
-    setCreatedBy('');
+    //setStatus('');
+    //setCreatedBy('');
   };
 
   // if (loading) return null;

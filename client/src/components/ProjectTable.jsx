@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function ProjectCard({ project }) {
+export default function ProjectTable({ project }) {
   return (
       <tr><td><img src={project.image} alt={`${project.title} banner`} style={{ width: '50px', border: '1px solid #ddd' }}/> <a href={`projects/${project.id}`}>{project.title}</a></td>
         <td>{project.clientID.name}</td>

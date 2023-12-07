@@ -4,10 +4,10 @@ const CommentSchema = new mongoose.Schema({
   message: {
     type: String,
   },
-  ticketID: {
-    type: String,
+  ticket: {
+    type: mongoose.Schema.Types.ObjectId,
   },
-  userID: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   }

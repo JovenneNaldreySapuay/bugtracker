@@ -120,11 +120,11 @@ const CommentType = new GraphQLObjectType({
   fields: () => ({
     id: { type: GraphQLID },
     message: { type: GraphQLString },
-    ticketID: { type: GraphQLString },
+    ticket: { type: GraphQLID },
     user: { 
       type: UserType,
-      resolve(parent, args) {         
-        return User.findById(parent.userID);
+      resolve(parent, args) { 
+        return User.findById(({ _id: parent.user }));
       }
     },
   }),
@@ -244,7 +244,7 @@ const RootQuery = new GraphQLObjectType({
         ticket_id: { type: GraphQLID },
       },
       resolve(parent, args) {  
-        return Comment.find({ ticketID: args.ticket_id });
+        return Comment.find({ ticket: args.ticket_id });
       }
     },
     attachments: {
@@ -496,14 +496,14 @@ const mutation = new GraphQLObjectType({
       type: CommentType,
       args: {
         message: { type: GraphQLNonNull(GraphQLString) },
-        ticketID: { type: GraphQLNonNull(GraphQLString) },
-        userID: { type: GraphQLNonNull(GraphQLID) },
+        ticket: { type: GraphQLNonNull(GraphQLID) },
+        user: { type: GraphQLNonNull(GraphQLID) },
       },
       resolve(parent, args) {
         const comment = new Comment({
           message: args.message,
-          ticketID: args.ticketID,
-          userID: args.userID,
+          ticket: args.ticket,
+          user: args.user,
         });
 
         return comment.save();
