@@ -38,8 +38,8 @@ export default function UpdateProjectModal({ project }) {
 
   const getClients = useQuery(GET_USERS);
 
-  console.log('project', project);
-  console.log('tickets state', tickets);
+  //console.log('project', project);
+  //console.log('tickets state', tickets);
 
   const getUsers = useQuery(GET_USERS);
 

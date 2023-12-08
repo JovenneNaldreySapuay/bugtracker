@@ -1,26 +1,30 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { ADD_COMMENT } from '../mutations/commentMutations';
-import { GET_COMMENTS } from '../queries/commentQueries';
+import { GET_COMMENTS, GET_COMMENTS_PER_TICKET } from '../queries/commentQueries';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function AddComment({ ticket }) {
 	const [message, setMessage] = useState('');
 	const [ticketID, setTicketID] = useState(ticket.id);
 	const [user, setUser] = useState('655876c0d467b3b136a481c4');
 
+	const notify = () => toast("Comment added!", {
+		position: "top-right",
+		autoClose: 2000,
+		hideProgressBar: true,
+		closeOnClick: true,
+		pauseOnHover: false,
+		draggable: false,
+		progress: undefined,
+		theme: "dark",
+	});
+
 	const [addComment] = useMutation(ADD_COMMENT, {
 	    variables: { message, ticket: ticketID, user },
-	    update(cache, { data: { addComment } }) {
-	      
-	      // get all data from the database
-	      //const { comments } = cache.readQuery({ query: GET_COMMENTS });
-
-	      // And then append the new data and update the UI
-	      //cache.writeQuery({
-	        //query: GET_COMMENTS,
-	        //data: { comments: [...comments, addComment] },
-	      //});
-	    },
+	    refetchQueries: [{ query: GET_COMMENTS_PER_TICKET, variables: { ticket_id: ticket.id } }],
 	  });
 
 	const onSubmit = (e) => {
@@ -30,7 +34,8 @@ export default function AddComment({ ticket }) {
 
 		// mutation here 
 		if (message !== '') {
-			addComment(message, ticketID, user);	
+			addComment(message, ticketID, user);
+			notify();	
 		}		
 
 		// clear input field
@@ -44,12 +49,14 @@ export default function AddComment({ ticket }) {
 	              <label className='form-label'>Comment</label>
 
 	              <div>
-	              	<textarea placeholder="Add your message" id="message" name="message" rows="4" cols="50" onChange={(e) => setMessage(e.target.value)} />
+	              	<textarea placeholder="Add your message" id="message" name="message" rows={4} cols={50} value={message} onChange={(e) => setMessage(e.target.value)} />
 	              </div>
 
 	            </div>	
 	    		<button type='submit' className='btn btn-primary'>Add Comment</button>
 			</form>
+
+			<ToastContainer />
 		</>
 	);
 

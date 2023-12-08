@@ -2,12 +2,13 @@ import React from 'react';
 
 export default function ProjectTable({ project }) {
   return (
-      <tr><td><img src={project.image} alt={`${project.title} banner`} style={{ width: '50px', border: '1px solid #ddd' }}/> <a href={`projects/${project.id}`}>{project.title}</a></td>
+      <tr>
+        <td>{project.id}</td>
+        <td><img src={project.image} alt={`${project.title} banner`} style={{ width: '50px', border: '1px solid #ddd' }}/> <a href={`projects/${project.id}`}>{project.title}</a></td>
         <td>{project.clientID.name}</td>
         {project.tickets.length > 0 ? project.tickets.length == 1 ? <td>{`${project.tickets.length} ticket`}</td> :
-                  <td>{`${project.tickets.length} tickets`}</td> : <td>No issue</td>}
-        <td>{project.status} {project.id}</td>
-
+                  <td>{`${project.tickets.length} tickets`}</td> : <td>No ticket</td>}
+        <td>{project.status}</td>
         <td><div className='project-cta'><a href="">Add Ticket</a> <a href="">All Tickets</a> <a href="">Delete</a></div></td>
       </tr>  
   );

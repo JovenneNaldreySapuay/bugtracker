@@ -10,7 +10,7 @@ export default function Comment() {
 	const { id } = useParams();
   	const { loading, error, data } = useQuery(GET_COMMENTS_PER_TICKET, { 
   		variables: { ticket_id: id },
-  		pollInterval: 500, 
+  		//pollInterval: 500, 
   	});
 
   	console.log('GET_COMMENTS_PER_TICKET:', data);
@@ -23,7 +23,7 @@ export default function Comment() {
 			<h3>Comments Per Project</h3>
 			<ol>
 				{data.commentsPerTicket?.map((comment) => (
-	                <li key={comment.id}>{comment.message}</li>
+	                <li style={{ marginTop: '20px' }} key={comment.id}><em>{comment.user.name}</em> commented: <br />{comment.message}</li>
 	            ))}
 			</ol>
 		</>

@@ -83,7 +83,6 @@ const TicketType = new GraphQLObjectType({
     assignees: { 
       type: new GraphQLList(UserType), 
       resolve(parent, args) {
-        //console.log(parent, args);
         return User.find({ _id: parent.assignees });
       } 
     },

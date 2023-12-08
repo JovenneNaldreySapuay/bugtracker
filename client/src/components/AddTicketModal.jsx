@@ -5,10 +5,12 @@ import { useHistory, useParams } from 'react-router-dom';
 import { FaList } from 'react-icons/fa';
 import { useMutation, useQuery } from '@apollo/client';
 import { ADD_TICKET } from '../mutations/ticketMutations';
-import { GET_USERS, GET_PROJECT } from '../queries/projectQueries';
+import { GET_USERS, GET_PROJECT, GET_TICKETS_PER_PROJECT } from '../queries/projectQueries';
 import { GET_TICKETS } from '../queries/ticketQueries';
 
 export default function AddTicketModal() {
+
+  const { id } = useParams();
 
   const adminID = '655876c0d467b3b136a481c4'; //'6560a67f3557cdc6c6f528c9'; // TODO: make this dynamic
 
@@ -38,10 +40,7 @@ export default function AddTicketModal() {
        submitter, 
        project 
     },
-    //refetchQueries: [
-       //GET_PROJECT,
-       //'getProject' 
-    //]
+    refetchQueries: [{ query: GET_TICKETS_PER_PROJECT, variables: { project_id: id } }],
   });
 
   /*
@@ -65,8 +64,6 @@ export default function AddTicketModal() {
   */
  
   const getUsers = useQuery(GET_USERS);
-
-  const { id } = useParams();
 
   //const getProject = useQuery(GET_PROJECT, { variables: { id } });
 

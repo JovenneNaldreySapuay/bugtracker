@@ -38,7 +38,7 @@ const ADD_TICKET = gql`
       comments {
         id 
         message
-        ticketID 
+        ticket 
       }
   	  attachments {
     		id

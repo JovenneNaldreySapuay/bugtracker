@@ -22,6 +22,7 @@ export default function Projects() {
               <table className='project-table'>
                 <thead>
                   <tr>
+                    <th>ID No.</th>
                     <th>Project</th>
                     <th>Client Name</th>
                     <th>Tickets</th>

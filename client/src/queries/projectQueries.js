@@ -93,4 +93,25 @@ const GET_CLIENTS = gql`
   }
 `;
 
-export { GET_PROJECTS, GET_PROJECT, GET_CLIENTS, GET_USERS };
+const GET_TICKETS_PER_PROJECT = gql`
+  query getTicketsPerProject($project_id: ID!) {
+    ticketsPerProject(project_id: $project_id) {
+      id
+      title  
+      description
+      ticketType
+      status
+      priority
+      assignees {
+        id 
+        name
+      }
+      submitter {
+        id 
+        name
+      }
+    }
+  }
+`;
+
+export { GET_PROJECTS, GET_PROJECT, GET_CLIENTS, GET_USERS, GET_TICKETS_PER_PROJECT };

@@ -9,7 +9,7 @@ import TicketCard from '../components/TicketCard';
 //import EditProjectForm from '../components/EditProjectForm';
 import UpdateProjectModal from '../components/UpdateProjectModal';
 import { useQuery } from '@apollo/client';
-import { GET_PROJECT } from '../queries/projectQueries';
+import { GET_PROJECT, GET_TICKETS_PER_PROJECT } from '../queries/projectQueries';
 
 export default function Project() {
   const { id } = useParams();
@@ -19,7 +19,11 @@ export default function Project() {
    // pollInterval: 500, 
   });
 
-  //console.log('Get single project:', data);
+  const getTicketsPerProject = useQuery(GET_TICKETS_PER_PROJECT, {
+    variables: { project_id: id }
+  })
+
+  //console.log('getTicketsPerProject:', getTicketsPerProject);
 
   if (loading) return <Spinner />;
   if (error) return <p>Something Went Wrong</p>;
@@ -63,8 +67,8 @@ export default function Project() {
           <h5 className='mt-3'>Client Info</h5>
           <p className='lead'>{data.project.clientID.name} - {data.project.clientID.website}</p>
 
-          <h5 className='mt-3'>Tickets <span style={{color: 'blue', fontSize: '14px', cursor: 'pointer'}} onClick={() => refetch()}><FaSyncAlt className='icon' />Reload</span></h5>
-          {
+          {/*<h5 className='mt-3'>Tickets <span style={{color: 'blue', fontSize: '14px', cursor: 'pointer'}} onClick={() => refetch()}><FaSyncAlt className='icon' />Reload</span></h5>*/}
+          {/*
             data.project.tickets.length > 0 ? (
               <ol>
               {
@@ -92,9 +96,10 @@ export default function Project() {
             (
               <p>No tickets for this project</p>
             )
-          }
+          */}
           
-          {data.project.tickets?.map((ticket, id) => (
+          <h5 className='mt-3'>Tickets</h5>
+          {getTicketsPerProject.data?.ticketsPerProject.map((ticket, id) => (
             <TicketCard key={ticket.id} ticket={ticket} />
           ))}
 
