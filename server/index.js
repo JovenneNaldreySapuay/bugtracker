@@ -9,6 +9,8 @@ const schema = require('./schema/schema');
 
 const connectDB = require('./config/db');
 
+const isAuth = require('./middleware/is-auth');
+
 const port = process.env.PORT || 5000;
 
 const app = express();
@@ -16,9 +18,16 @@ const app = express();
 // Connect to mongoDB database
 connectDB();
 
-app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:1234',
+  credentials: true // <-- REQUIRED backend setting
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
+
+app.use(isAuth);
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {

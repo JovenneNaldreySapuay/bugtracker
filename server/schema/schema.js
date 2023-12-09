@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const User       = require('../models/User');
 const Project    = require('../models/Project');
@@ -15,6 +17,15 @@ const {
   GraphQLNonNull,
   GraphQLEnumType,
 } = require('graphql');
+
+const AuthDataType = new GraphQLObjectType({
+  name: 'Auth',
+  fields: () => ({
+    userID: { type: GraphQLID },
+    token:  { type: GraphQLString },
+    //tokenExpiration:  { type: GraphQLInt },
+  }),
+});
 
 // UserType
 const UserType = new GraphQLObjectType({
@@ -149,6 +160,44 @@ const AttachmentType = new GraphQLObjectType({
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
+    login: {
+      type: AuthDataType,
+      args: {
+        email: { type: GraphQLString },
+        password: { type: GraphQLString } 
+      },
+      async resolve(parent, args) {
+        const user = await User.findOne({ email: args.email });
+
+        console.log('Login:', {user});
+
+        if (!user) {
+          throw new Error('User does not exist!');
+        }
+
+        const isEqual = await bcrypt.compare(args.password, user.password);
+
+        console.log('isEqual:', isEqual);
+
+        if (!isEqual) {
+          throw new Error('Password is incorrect!');
+        }
+        
+        const token = jwt.sign({ userID: user.id, email: user.email },
+          'somesupersecretkey',
+          {
+            expiresIn: '1h'
+          }
+        );
+
+        console.log('token:', token);
+
+        console.log('return:', {userID: user.id, token: token, tokenExpiration: 1});
+
+
+        return { userID: user.id, token: token, tokenExpiration: 1 };
+      }
+    },
     users: {
       type: new GraphQLList(UserType),
       resolve(parent, args) {
@@ -269,14 +318,18 @@ const mutation = new GraphQLObjectType({
         company: { type: GraphQLString },
         website: { type: GraphQLString },
         phone: { type: GraphQLString },
-        role: { type: GraphQLNonNull(GraphQLString) },
+        role: { type: GraphQLString },
         subscription: { type: GraphQLString },
       },
-      resolve(parent, args) {
+      async resolve(parent, args) {
+        const hashedPassword = await bcrypt.hash(args.password, 12);
+
+        console.log('hashedPassword:', hashedPassword);
+
         const user = new User({
           name: args.name,
           email: args.email,
-          password: args.password,
+          password: hashedPassword,
           company: args.company,
           website: args.website,
           phone: args.phone,
@@ -311,7 +364,11 @@ const mutation = new GraphQLObjectType({
         role: { type: GraphQLString }, 
         subscription: { type: GraphQLString }, 
       },
-      resolve(parent, args) {
+      async resolve(parent, args) {
+        
+        const hashedPassword = await bcrypt.hash(args.password, 12);
+
+        console.log('update user hashed', hashedPassword);
 
         return User.findByIdAndUpdate(
           args.id,
@@ -319,7 +376,7 @@ const mutation = new GraphQLObjectType({
             $set: {
               name: args.name,
               email: args.email,
-              password: args.password,
+              password: hashedPassword,
               website: args.website,
               company: args.company,
               phone: args.phone,

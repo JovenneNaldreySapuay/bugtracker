@@ -9,7 +9,7 @@ export default function ProjectTable({ project }) {
         {project.tickets.length > 0 ? project.tickets.length == 1 ? <td>{`${project.tickets.length} ticket`}</td> :
                   <td>{`${project.tickets.length} tickets`}</td> : <td>No ticket</td>}
         <td>{project.status}</td>
-        <td><div className='project-cta'><a href="">Add Ticket</a> <a href="">All Tickets</a> <a href="">Delete</a></div></td>
+        <td><div className='project-cta'><a href={`projects/${project.id}/edit`}>Edit</a> <a href="">Delete</a></div></td>
       </tr>  
   );
 }

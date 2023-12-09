@@ -1,10 +1,30 @@
 import React, { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { ToastContainer, toast } from 'react-toastify';
+
+import { ADD_USER } from '../mutations/userMutations';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function SignUp() {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const notify = () => toast("Sign up saved!", {
+    position: "top-right",
+    autoClose: 2000,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: false,
+    progress: undefined,
+    theme: "dark",
+  });
+
+  const [addUser] = useMutation(ADD_USER, {
+    variables: { name, email, password },
+  });
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -14,6 +34,8 @@ export default function SignUp() {
     // mutation here 
     if (name !== '' && email !== '' && password !== '') {
       //mutation
+      addUser(name, email, password);
+      notify(); 
     }   
 
     // clear input field
@@ -67,6 +89,9 @@ export default function SignUp() {
         </div>  
         <button type='submit' className='btn btn-primary'>Sign Up</button>
       </form>
+      <p className='mt-3'>Already have an account? <a href="/login">Login</a></p>
+      <ToastContainer />
+
     </>
   );
 }

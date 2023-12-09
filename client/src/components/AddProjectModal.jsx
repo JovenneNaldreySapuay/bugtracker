@@ -164,6 +164,7 @@ export default function AddProjectModal() {
       {!loading && !error && (
         <>
           <button
+            style={{ margin: '20px 0' }}
             type='button'
             className='btn btn-primary'
             data-bs-toggle='modal'

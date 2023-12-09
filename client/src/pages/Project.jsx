@@ -13,7 +13,11 @@ import { GET_PROJECT, GET_TICKETS_PER_PROJECT } from '../queries/projectQueries'
 
 export default function Project() {
   const { id } = useParams();
-  //console.log('ID Belongs to:', id);
+
+  const editingMode = window.location.pathname.split("/")[3];
+
+  //console.log('location:', currentPath);
+
   const { loading, error, data, refetch } = useQuery(GET_PROJECT, {
    variables: { id },
    // pollInterval: 500, 
@@ -32,10 +36,13 @@ export default function Project() {
     <>
       {!loading && !error && (
         <div className='mx-auto w-75 card p-5'>
-          <Link to='/' className='btn btn-light btn-sm w-25 d-inline ms-auto'>
-            Back
+          <Link to='/projects' className='btn btn-light btn-sm w-25 d-inline ms-auto'>
+            Back to Projects
           </Link>
 
+          {!editingMode && (
+          <>
+          <h3>View Mode</h3>
           <img src={data.project.image} alt="Info" style={{ width: '150px' }} />
 
           <h1>{data.project.title}</h1>
@@ -67,52 +74,19 @@ export default function Project() {
           <h5 className='mt-3'>Client Info</h5>
           <p className='lead'>{data.project.clientID.name} - {data.project.clientID.website}</p>
 
-          {/*<h5 className='mt-3'>Tickets <span style={{color: 'blue', fontSize: '14px', cursor: 'pointer'}} onClick={() => refetch()}><FaSyncAlt className='icon' />Reload</span></h5>*/}
-          {/*
-            data.project.tickets.length > 0 ? (
-              <ol>
-              {
-                data.project.tickets.map((ticket, idx) => (
-                  <li key={ticket.id}>
-                    {ticket.title}
-                    {
-                      data.project.tickets[idx].comments.length > 0 ? (
-                        <ul>
-                           {
-                            data.project.tickets[idx].comments.map((comment) => (
-                               <li key={comment.id}><strong><em>{`${comment.user.name} commented: `}</em></strong>{comment.message}</li> 
-                            ))
-                           } 
-                        </ul>
-                      ) : (
-                      <p>No message for this ticket.</p>
-                      )
-                    }
-                  </li>
-                ))
-              }
-              </ol>
-            ) : 
-            (
-              <p>No tickets for this project</p>
-            )
-          */}
           
           <h5 className='mt-3'>Tickets</h5>
           {getTicketsPerProject.data?.ticketsPerProject.map((ticket, id) => (
             <TicketCard key={ticket.id} ticket={ticket} />
           ))}
 
-          {/*<ClientInfo client={data.project.clientId.name} />*/}
-
-          {/*<EditProjectForm project={data.project} />*/}
-
-          {/*<DeleteProjectButton projectId={data.project.id} />*/}
-
           <AddTicketModal />
+          </>
+          )}
 
-          <UpdateProjectModal project={data.project} />
-
+          {editingMode === 'edit' && ( 
+            <UpdateProjectModal project={data.project} />
+          )}
         </div>
       )}
     </>

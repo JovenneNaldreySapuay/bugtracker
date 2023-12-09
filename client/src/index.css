@@ -12,6 +12,17 @@ code {
     monospace;
 }
 
+.header-links {
+  display: flex;
+  list-style: none;
+  justify-content: space-evenly;
+  align-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px 0;
+  background: #f1f1f1;
+}
+
 .navbar-brand {
   color: #df3ca6;
 }

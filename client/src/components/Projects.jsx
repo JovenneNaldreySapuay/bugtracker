@@ -2,8 +2,9 @@ import React from 'react';
 import Spinner from './Spinner';
 import { useQuery } from '@apollo/client';
 import ProjectTable from './ProjectTable';
-
 import { GET_PROJECTS } from '../queries/projectQueries';
+
+import AddProjectModal from './AddProjectModal';
 
 export default function Projects() {
   const { loading, error, data } = useQuery(GET_PROJECTS);
@@ -15,6 +16,9 @@ export default function Projects() {
 
   return (
     <>
+     
+     <AddProjectModal /> 
+
      {data.projects.length > 0 ? (
         <div className='container'>
           <div className='row'>

@@ -166,10 +166,13 @@ export default function UpdateProjectModal({ project }) {
   return (
     <>
         { loggedIn && (
+
         <div className='asfdsfd' id='asdfsafsadf' style={{ marginTop: '20px' }}>
         <div className='xx3'>
         <div className='xx2'>
         <div className='xx1'>
+        <h3>Edit Project</h3>
+        
         <form onSubmit={onSubmit}>
         <input
         type='text'
