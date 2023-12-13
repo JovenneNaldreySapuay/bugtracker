@@ -1,14 +1,21 @@
 import React from 'react';
 import Spinner from './Spinner';
 import { useQuery } from '@apollo/client';
+import { Navigate } from 'react-router-dom';
+import { connect } from 'react-redux';
+
 import UsersTable from './UsersTable';
 import { GET_USERS } from '../queries/userQueries';
 
-export default function Users() {
+function Users(props) {
   const { loading, error, data } = useQuery(GET_USERS);
 
   if (loading) return <Spinner />;
   if (error) return <p>Something Went Wrong</p>;
+
+  if (! props.isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <>
@@ -44,3 +51,13 @@ export default function Users() {
     </>
   );
 }
+
+function mapStateToProps(state) {
+  console.log('state Users.js', state);  
+
+  return {
+    isAuthenticated: state.auth.payload ? !!state.auth.payload.token : false,
+  }
+}
+
+export default connect(mapStateToProps, {})(Users);

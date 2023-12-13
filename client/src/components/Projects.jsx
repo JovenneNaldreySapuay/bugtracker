@@ -1,18 +1,22 @@
 import React from 'react';
 import Spinner from './Spinner';
 import { useQuery } from '@apollo/client';
+import { Navigate } from 'react-router-dom';
+import { connect } from 'react-redux';
+
 import ProjectTable from './ProjectTable';
 import { GET_PROJECTS } from '../queries/projectQueries';
-
 import AddProjectModal from './AddProjectModal';
 
-export default function Projects() {
+function Projects({ isAuthenticated }) {
   const { loading, error, data } = useQuery(GET_PROJECTS);
-
-  console.log(data);
 
   if (loading) return <Spinner />;
   if (error) return <p>Something Went Wrong</p>;
+
+  if (! isAuthenticated) {
+    //return <Navigate to="/login" replace />;
+  }
 
   return (
     <>
@@ -49,3 +53,13 @@ export default function Projects() {
     </>
   );
 }
+
+function mapStateToProps(state) {
+  console.log('state Projects.js', state);  
+
+  return {
+    isAuthenticated: state.auth.payload ? !!state.auth.payload.token : false,
+  }
+}
+
+export default connect(mapStateToProps, {})(Projects);

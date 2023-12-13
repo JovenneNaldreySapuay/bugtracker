@@ -22,8 +22,11 @@ const AuthDataType = new GraphQLObjectType({
   name: 'Auth',
   fields: () => ({
     userID: { type: GraphQLID },
-    token:  { type: GraphQLString },
-    //tokenExpiration:  { type: GraphQLInt },
+    name:  { type: GraphQLString },
+    email: { type: GraphQLString },
+    role: { type: GraphQLString },  
+    token: { type: GraphQLString },
+    tokenExpiration: { type: GraphQLString },
   }),
 });
 
@@ -164,12 +167,12 @@ const RootQuery = new GraphQLObjectType({
       type: AuthDataType,
       args: {
         email: { type: GraphQLString },
-        password: { type: GraphQLString } 
+        password: { type: GraphQLString }
       },
       async resolve(parent, args) {
         const user = await User.findOne({ email: args.email });
 
-        console.log('Login:', {user});
+        console.log('Login Query:', {user});
 
         if (!user) {
           throw new Error('User does not exist!');
@@ -177,25 +180,25 @@ const RootQuery = new GraphQLObjectType({
 
         const isEqual = await bcrypt.compare(args.password, user.password);
 
-        console.log('isEqual:', isEqual);
+        console.log('password args', args.password, user.password);
+        console.log('password Equal?:', isEqual);
 
         if (!isEqual) {
           throw new Error('Password is incorrect!');
         }
         
-        const token = jwt.sign({ userID: user.id, email: user.email },
+        const token = jwt.sign({ userID: user.id, name: user.name, email: user.email, role: user.role },
           'somesupersecretkey',
           {
             expiresIn: '1h'
           }
         );
 
-        console.log('token:', token);
+        //console.log('token:', token);
 
-        console.log('return:', {userID: user.id, token: token, tokenExpiration: 1});
+        //console.log('return:', { userID: user.id, name: user.name, email: user.email, role: user.role, token: token, tokenExpiration: "1" });
 
-
-        return { userID: user.id, token: token, tokenExpiration: 1 };
+        return { userID: user.id, name: user.name, email: user.email, role: user.role, token: token, tokenExpiration: "1" };
       }
     },
     users: {
@@ -214,7 +217,7 @@ const RootQuery = new GraphQLObjectType({
     getClients: {
       type: new GraphQLList(UserType),
       resolve(parent, args) {
-        return User.find({ role: "client" });
+        return User.find({ role: "Client" });
       },
     },
     projects: {
@@ -366,6 +369,8 @@ const mutation = new GraphQLObjectType({
       },
       async resolve(parent, args) {
         
+        // @TODO: password is changed when updating here 
+
         const hashedPassword = await bcrypt.hash(args.password, 12);
 
         console.log('update user hashed', hashedPassword);
@@ -394,7 +399,7 @@ const mutation = new GraphQLObjectType({
       args: {
         title: { type: GraphQLNonNull(GraphQLString) },
         description: { type: GraphQLNonNull(GraphQLString) },
-        image: { type: GraphQLNonNull(GraphQLString) },
+        image: { type: GraphQLString },
         attachment: { type: GraphQLNonNull(GraphQLString) },  
         clientID: { type: GraphQLNonNull(GraphQLID) }, 
 		    tickets: { type: new GraphQLList(new GraphQLNonNull(GraphQLString)) },   

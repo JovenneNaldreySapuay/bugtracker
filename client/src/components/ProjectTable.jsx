@@ -1,6 +1,7 @@
 import React from 'react';
 
 export default function ProjectTable({ project }) {
+  //console.log('props', project);
   return (
       <tr>
         <td>{project.id}</td>

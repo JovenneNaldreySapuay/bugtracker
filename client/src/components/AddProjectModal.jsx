@@ -1,24 +1,28 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 import axios from 'axios';
+import { connect, useDispatch } from 'react-redux';
+
 import { FaList } from 'react-icons/fa';
 import { useMutation, useQuery } from '@apollo/client';
 import { ADD_PROJECT } from '../mutations/projectMutations';
 import { GET_PROJECTS, GET_CLIENTS, GET_USERS } from '../queries/projectQueries';
 
-export default function AddProjectModal() {
+function AddProjectModal(props) {
 
-  const adminID = '655876c0d467b3b136a481c4'; //'6560a67f3557cdc6c6f528c9'; // TODO: make this dynamic
+  const adminID = '6579297a384af3d71e04c12e'; //'6560a67f3557cdc6c6f528c9'; // TODO: make this dynamic
+
+  console.log("props:", props);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
   const [attachment, setAttachment] = useState('');
   const [clientID, setClientID] = useState('');
-  const [ticket, setTicket] = useState(['655c0d75b6d11aced8d85bc4']);
+  const [ticket, setTicket] = useState([]);
   const [assignee, setAssignees] = useState([]);  
   const [status, setStatus] = useState('');
-  const [createdBy, setcreatedBy] = useState(adminID);
+  const [createdBy, setcreatedBy] = useState(adminID); // props.id
 
   const [addProject] = useMutation(ADD_PROJECT, {
     variables: { title, description, image, attachment, clientID, ticket, assignee, status, createdBy },
@@ -38,11 +42,12 @@ export default function AddProjectModal() {
     },
   });
 
-  // console.log('From cache projects', projects);
 
   const getUsers = useQuery(GET_USERS);
 
   const userLists = getUsers.data?.users; 
+
+  console.log('userLists:', userLists);
 
   const assignedUsers = userLists?.map(({
   id: value,
@@ -72,6 +77,8 @@ export default function AddProjectModal() {
 
   // Get Clients for dropdown select
   const { loading, error, data } = useQuery(GET_CLIENTS);
+
+  console.log('GET_CLIENTS', data);
 
   const fileAttachHandler = async (e) => {
 
@@ -108,7 +115,7 @@ export default function AddProjectModal() {
 
       const imgUrl = res.data.secure_url;
 
-      //console.log("imgUrl:", imgUrl );
+      console.log("imgUrl:", res );
       //console.log("axios response 2", res.data );
 
       setImage(res.data.secure_url);
@@ -133,10 +140,8 @@ export default function AddProjectModal() {
     
     if (title !== '' && 
         description !== '' && 
-        image !== '' && 
         attachment !== '' && 
         clientID !== '' && 
-        ticket.length > 0 && 
         assignee.length > 0 && 
         status !== '' && 
         createdBy !== '') {
@@ -284,3 +289,14 @@ export default function AddProjectModal() {
     </>
   );
 }
+
+function mapStateToProps(state) {
+  console.log('state AddProjectModal.jsx', state);  
+
+  return {
+    id: state.auth.payload ? state.auth.payload.id : null,
+    isAuthenticated: state.auth.payload ? !!state.auth.payload.token : false,  
+  }
+}
+
+export default connect(mapStateToProps, { })(AddProjectModal);

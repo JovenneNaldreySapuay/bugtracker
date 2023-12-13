@@ -4,11 +4,13 @@ import axios from 'axios';
 import { useHistory, useParams } from 'react-router-dom';
 import { FaList } from 'react-icons/fa';
 import { useMutation, useQuery } from '@apollo/client';
+import { connect, useDispatch } from 'react-redux';
+
 import { ADD_TICKET } from '../mutations/ticketMutations';
 import { GET_USERS, GET_PROJECT, GET_TICKETS_PER_PROJECT } from '../queries/projectQueries';
 import { GET_TICKETS } from '../queries/ticketQueries';
 
-export default function AddTicketModal() {
+function AddTicketModal(props) {
 
   const { id } = useParams();
 
@@ -22,7 +24,7 @@ export default function AddTicketModal() {
   const [assignees, setAssignees] = useState([]);
   const [comments, setComments] = useState([]);  
   const [attachments, setAttachments] = useState([]);  
-  const [submitter, setSubmitter] = useState(adminID);
+  const [submitter, setSubmitter] = useState(props.id);
   const [project, setProject] = useState(window.location.pathname.split("/")[2]);
   const [redirectTo, setRedirectTo] = useState(false);
 
@@ -269,3 +271,14 @@ export default function AddTicketModal() {
     </>
   );
 }
+
+function mapStateToProps(state) {
+  console.log('state AddTicketModal.jsx', state);  
+
+  return {
+    id: state.auth.payload ? state.auth.payload.id : null,
+    isAuthenticated: state.auth.payload ? !!state.auth.payload.token : false,  
+  }
+}
+
+export default connect(mapStateToProps, { })(AddTicketModal);

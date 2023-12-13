@@ -1,27 +1,50 @@
-import React, { useState } from 'react';
-import { useQuery } from '@apollo/client';
+import React, { useState, useContext } from 'react';
+import { connect, useDispatch } from 'react-redux';
+import { useNavigate, Navigate } from 'react-router-dom';
+// import { withRouter } from 'react-router-dom';
+
+import * as actions from '../constants/action-types';
 import { LOGIN } from '../queries/userQueries';
+import { userLoggedIn, login } from '../actions/auth';
+// import AuthContext from '../context/auth-context';
 
-export default function Login() {
+import { useQuery } from '@apollo/client';
+import { GET_USER } from '../queries/userQueries';
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+function Login(props) {
 
-  // const { loading, error, data } = useQuery(LOGIN, {
-  //   variables: { email, password },
-  // });
+  // console.log('props', props);
+   
+  if (props.isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState('jovenne@admin.io');
+  const [password, setPassword] = useState('password');
+
+  // const authContextType = useContext(AuthContext);
+
+  // see this - https://www.youtube.com/watch?v=wMg_b1zZcag
 
   const onSubmit = (e) => {
     e.preventDefault();
 
-    console.log('login states:', email, password); 
+    //console.log('login states:', email, password); 
 
-    let requestBody = {
+    const requestBody = {
       query: `
         query {
           login(email: "${email}", password: "${password}") {
             userID
             token
+            name
+            email
+            role
+            tokenExpiration
           }
         }
       `
@@ -37,22 +60,48 @@ export default function Login() {
       }
     })
     .then(res => {
+      console.log('res status', res);
+
       if (res.status !== 200 && res.status !== 201) {
-      throw new Error('Failed!');
+        throw new Error('Failed!');
       }
+
       return res.json();
+
     })
-    .then(resData => {
-      console.log(resData);
+    .then(resData => {  
+
+      console.log('resData', resData);
+
+      const { userID, name, email, role, tokenExpiration, token } = resData.data.login;
+
+      //props.login(resData.data.login).then(res => console.log('what?', res)).then(resData => console.log('what2?', resData));
+
+      dispatch({
+          type: actions.USER_LOGGED_IN,
+          payload: {
+              userID,
+              name,
+              email,
+              role,
+              tokenExpiration,
+              token,
+          }
+      });   
+
+      //dispatch(userLoggedIn(resData.data.login));
+
+      // store token into our localStorage
+      localStorage.setItem('token', token);
+
+      navigate("/dashboard");
     })
     .catch(err => {
-      console.log(err);
-    });
 
-    // clear input field
-    //setEmail('');
-    //setPassword('');
-  }
+      console.log(err);
+
+    });
+}
 
   return (
     <>
@@ -75,7 +124,7 @@ export default function Login() {
             <label className='form-label'>Password</label>
             <div>
               <input
-                type='text'
+                type='password'
                 className='form-control'
                 placeholder='Password'
                 id='password'
@@ -90,3 +139,15 @@ export default function Login() {
     </>
   );
 }
+
+function mapStateToProps(state) {
+  console.log('Login page state:', state);  
+  return {
+    isAuthenticated: state.auth.payload ? !!state.auth.payload.token : false,
+    email: state.auth.payload ? state.auth.payload.email : '',
+    name: state.auth.payload ? state.auth.payload.name : '',
+    role: state.auth.payload ? state.auth.payload.role : '',    
+  }
+}
+
+export default connect(mapStateToProps, { login })(Login);

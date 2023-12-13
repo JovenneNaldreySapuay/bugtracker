@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function AddComment({ ticket }) {
 	const [message, setMessage] = useState('');
 	const [ticketID, setTicketID] = useState(ticket.id);
-	const [user, setUser] = useState('655876c0d467b3b136a481c4');
+	const [user, setUser] = useState('6579297a384af3d71e04c12e');
 
 	const notify = () => toast("Comment added!", {
 		position: "top-right",

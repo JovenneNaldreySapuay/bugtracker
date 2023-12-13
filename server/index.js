@@ -6,28 +6,62 @@ const multer = require('multer');
 const { graphqlHTTP } = require('express-graphql');
 
 const schema = require('./schema/schema');
-
 const connectDB = require('./config/db');
-
 const isAuth = require('./middleware/is-auth');
 
 const port = process.env.PORT || 5000;
 
 const app = express();
 
+// app.use(function (req, res, next) {
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   res.setHeader("Access-Control-Allow-Credentials", "true");
+//   res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+//   res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+
+//   next();
+// });
+
 // Connect to mongoDB database
 connectDB();
 
 const corsOptions = {
-  origin: 'http://localhost:1234',
+  origin: true,
   credentials: true // <-- REQUIRED backend setting
 };
 
 app.use(cors(corsOptions));
 
+//app.use(cors());
+
 app.use(express.json());
 
-app.use(isAuth);
+// app.use((req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+//   res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
+//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//   if (req.method === 'OPTIONS') {
+//     return res.sendStatus(200);
+//   }
+//   next();
+// });
+
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+  res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+
+  next();
+});
+
+// app.use(isAuth);
+
+// Routes
+// require('./routes/authRoutes')(app); 
+
+// Models
+// require('./models/User');
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {

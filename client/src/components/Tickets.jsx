@@ -1,19 +1,25 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import Spinner from './Spinner';
+import { connect } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 
 import TicketTable from './TicketTable';
 import AddTicketModal from '../components/AddTicketModal';
 
 import { GET_TICKETS } from '../queries/ticketQueries';
 
-export default function Tickets() {
+function Tickets(props) {
   const { loading, error, data } = useQuery(GET_TICKETS);
 
-  console.log(data);
+  // console.log(data);
 
   if (loading) return <Spinner />;
   if (error) return <p>Something Went Wrong</p>;
+
+  if (! props.isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <>
@@ -47,3 +53,13 @@ export default function Tickets() {
     </>
   );
 }
+
+function mapStateToProps(state) {
+  //console.log('state Projects.js', state);  
+
+  return {
+    isAuthenticated: state.auth.payload ? !!state.auth.payload.token : false,
+  }
+}
+
+export default connect(mapStateToProps, {})(Tickets);
